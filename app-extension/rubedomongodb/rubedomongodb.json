@@ -1,0 +1,11 @@
+{
+    "extensionName": "rubedomongodb",
+    "models":[],
+    "stores":[],
+    "views":[],
+    "controllers":["RubedoMongoController"],
+    "launchButtons":{
+        "studio":[],
+        "administration":[]
+    }
+}
