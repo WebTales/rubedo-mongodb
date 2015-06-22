@@ -16,6 +16,10 @@
  */
 namespace RubedoMongoDB\Collection;
 use Rubedo\Collection\AbstractCollection;
+use Rubedo\Services\Manager;
+use Zend\Debug\Debug;
+use Zend\EventManager\EventInterface;
+
 
 
 class MongoDBMappings extends AbstractCollection
@@ -38,5 +42,11 @@ class MongoDBMappings extends AbstractCollection
         ),
 
     );
+
+    public function syncContentEvent(EventInterface $e)
+    {
+        $data = $e->getParam('data', array());
+        $content = Manager::getService("Contents")->findById($data['id'], true, false);
+    }
 
 }
