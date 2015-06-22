@@ -92,6 +92,8 @@ Ext.define('Rubedo.view.MongodbMappingsInterface', {
                 {
                     xtype: 'panel',
                     flex: 1,
+                    id:"mongoMappingsHolderPanel",
+                    disabled:true,
                     autoScroll: true,
                     title: '',
                     items: [
@@ -233,10 +235,12 @@ Ext.define('Rubedo.view.MongodbMappingsInterface', {
         if (Ext.isEmpty(selected)){
             Ext.getCmp("mongoMappingsRemoveBtn").disable();
             Ext.getCmp("mongoMappingsSaveBtn").disable();
+            Ext.getCmp("mongoMappingsHolderPanel").disable();
 
         } else {
             Ext.getCmp("mongoMappingsRemoveBtn").enable();
             Ext.getCmp("mongoMappingsSaveBtn").enable();
+            Ext.getCmp("mongoMappingsHolderPanel").enable();
             Ext.getCmp("mongoMappingSettingsForm").getForm().setValues(selected[0].getData());
             var fieldsToAdd=[
                 {

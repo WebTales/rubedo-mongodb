@@ -1,11 +1,16 @@
 {
     "extensionName": "rubedomongodb",
-    "models":[],
-    "stores":[],
-    "views":[],
+    "models":["MongodbMapping"],
+    "stores":["MongodbMappings","CTForMapping"],
+    "views":["MongodbMappingsInterface","AddMongoMappingWindow"],
     "controllers":["RubedoMongoController"],
     "launchButtons":{
-        "studio":[],
-        "administration":[]
+      "studio":[{
+        "favoriteIcon": "database.png",
+        "itemId": "MongodbMappingsInterface",
+        "iconCls": "media-icon",
+        "text": "MongoDB Mappings"
+      }],
+      "administration":[]
     }
 }

@@ -26,6 +26,7 @@ Ext.define('Rubedo.view.AddMongoMappingWindow', {
     id: 'AddMongoMappingWindow',
     width: 400,
     constrain: true,
+    iconCls: 'media-icon',
     title: 'New MongoDB Mapping',
     modal: true,
 
