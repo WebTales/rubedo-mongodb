@@ -5,7 +5,6 @@ Ext.define('Rubedo.controller.RubedoMongoController', {
     alias: 'controller.RubedoMongoController',
 
     init: function(application) {
-        console.log("test");
     }
 
 });

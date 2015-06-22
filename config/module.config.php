@@ -33,7 +33,7 @@ return array(
         ),
     ),
 
-    /*
+   /*
     *  Backoffice route definitions
     */
     'router' => array (
