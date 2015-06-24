@@ -64,9 +64,24 @@ class MongoDBMappings extends AbstractCollection
             $db = $connection->selectDB($mapping["databaseName"]);
             $collection = $db->selectCollection($mapping["collectionName"]);
             $collection->update(array("rubedoContentId"=>(string)$content["id"]),array('$set'=>$payload),array("upsert"=>true,"w"=>0));
-
         }
+    }
 
+    public function syncContentTypeUp($mappingId){
+        $mapping = $this->findById($mappingId);
+        $contents=Manager::getService("Contents")->getByType($mapping["contentTypeId"]);
+        $connection = new \MongoClient($mapping["connexionString"]);
+        $db = $connection->selectDB($mapping["databaseName"]);
+        $collection = $db->selectCollection($mapping["collectionName"]);
+        foreach($contents["data"] as $content){
+            $payload=array();
+            foreach($mapping["fieldMappings"] as $rubedoField => $externalField){
+                if($externalField&&$externalField!=""&&isset($content["fields"][$rubedoField])){
+                    $payload[$externalField]=$content["fields"][$rubedoField];
+                }
+            }
+            $collection->update(array("rubedoContentId"=>(string)$content["id"]),array('$set'=>$payload),array("upsert"=>true,"w"=>0));
+        }
     }
 
 }
