@@ -135,6 +135,13 @@ Ext.define('Rubedo.view.MongodbMappingsInterface', {
                                         {
                                             xtype: 'textfield',
                                             anchor: '100%',
+                                            fieldLabel: 'Database name',
+                                            name: 'databaseName',
+                                            allowBlank: false,
+                                            allowOnlyWhitespace: false
+                                        },{
+                                            xtype: 'textfield',
+                                            anchor: '100%',
                                             fieldLabel: 'Collection name',
                                             name: 'collectionName',
                                             allowBlank: false,

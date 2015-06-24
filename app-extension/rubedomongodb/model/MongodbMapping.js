@@ -57,6 +57,9 @@ Ext.define('Rubedo.model.MongodbMapping', {
             name: 'connexionString'
         },
         {
+            name: 'databaseName'
+        },
+        {
             name: 'collectionName'
         },
         {
