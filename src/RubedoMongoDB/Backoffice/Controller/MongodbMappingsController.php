@@ -41,6 +41,34 @@ class MongodbMappingsController extends DataAccessController
         $this->_dataService = Manager::getService('MongoDBMappings');
     }
 
+    public function syncContentTypeUpAction(){
+        $mappingId=$this->params()->fromPost('mappingId',null);
+        if (!$mappingId){
+            $this->_returnJson(array(
+                "success"=>false,
+                "message"=>"Missing required mappingId param"
+            ));
+        }
+        $this->_dataService->syncContentTypeUp($mappingId);
+        return $this->_returnJson(array(
+            "success"=>true,
+        ));
+    }
+
+    public function syncContentTypeDownAction(){
+        $mappingId=$this->params()->fromPost('mappingId',null);
+        if (!$mappingId){
+            $this->_returnJson(array(
+                "success"=>false,
+                "message"=>"Missing required mappingId param"
+            ));
+        }
+        $workingLanguage=$this->params()->fromPost('workingLanguage','en');
+        $this->_dataService->syncContentTypeDown($mappingId,$workingLanguage);
+        return $this->_returnJson(array(
+            "success"=>true,
+        ));
+    }
 
 
 

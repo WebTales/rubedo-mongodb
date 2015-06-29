@@ -35,6 +35,7 @@ Ext.define('Rubedo.view.MongodbMappingsInterface', {
 
     height: 533,
     id: 'MongodbMappingsInterface',
+    ACL: 'execute.ui.technicalDashboard',
     width: 852,
     constrainHeader: true,
     iconCls: 'media-icon',
@@ -168,8 +169,8 @@ Ext.define('Rubedo.view.MongodbMappingsInterface', {
                     items: [
                         {
                             xtype: 'button',
-                            ACL: 'write.ui.mailingLists',
                             id: 'mongoMappingsAddBtn',
+                            ACL: 'execute.ui.technicalDashboard',
                             iconAlign: 'top',
                             iconCls: 'add_big',
                             scale: 'large',
@@ -183,8 +184,8 @@ Ext.define('Rubedo.view.MongodbMappingsInterface', {
                         },
                         {
                             xtype: 'button',
-                            ACL: 'write.ui.mailingLists',
                             disabled: true,
+                            ACL: 'execute.ui.technicalDashboard',
                             id: 'mongoMappingsRemoveBtn',
                             iconAlign: 'top',
                             iconCls: 'remove_big',
@@ -199,7 +200,7 @@ Ext.define('Rubedo.view.MongodbMappingsInterface', {
                         },
                         {
                             xtype: 'button',
-                            ACL: 'write.ui.mailingLists',
+                            ACL: 'execute.ui.technicalDashboard',
                             localiserId: 'saveBtn',
                             disabled: true,
                             id: 'mongoMappingsSaveBtn',
@@ -213,6 +214,58 @@ Ext.define('Rubedo.view.MongodbMappingsInterface', {
                                     scope: me
                                 }
                             }
+                        },
+                        {
+                            xtype: 'button',
+                            ACL: 'execute.ui.technicalDashboard',
+                            disabled: true,
+                            id: 'mongoMappingsSyncDownBtn',
+                            iconAlign: 'top',
+                            iconCls: 'database_down_big',
+                            scale: 'large',
+                            handler:function(btn){
+                                btn.setLoading(true);
+                                Ext.Ajax.request({
+                                    url: 'mongodb-mappings/sync-content-type-down',
+                                    params: {
+                                        mappingId: Ext.getCmp("mongoMappingsMainGrid").getSelectionModel().getLastSelected().get("id")
+                                    },
+                                    success: function(response){
+                                        btn.setLoading(false);
+                                        Ext.Msg.alert("Success","Sync complete");
+                                    },
+                                    failure: function(response){
+                                        btn.setLoading(false);
+                                    }
+                                });
+                            },
+                            text: 'Sync down'
+                        },
+                        {
+                            xtype: 'button',
+                            ACL: 'execute.ui.technicalDashboard',
+                            disabled: true,
+                            id: 'mongoMappingsSyncUpBtn',
+                            iconAlign: 'top',
+                            iconCls: 'database_up_big',
+                            scale: 'large',
+                            handler:function(btn){
+                                btn.setLoading(true);
+                                Ext.Ajax.request({
+                                    url: 'mongodb-mappings/sync-content-type-up',
+                                    params: {
+                                        mappingId: Ext.getCmp("mongoMappingsMainGrid").getSelectionModel().getLastSelected().get("id")
+                                    },
+                                    success: function(response){
+                                        btn.setLoading(false);
+                                        Ext.Msg.alert("Success","Sync complete");
+                                    },
+                                    failure: function(response){
+                                        btn.setLoading(false);
+                                    }
+                                });
+                            },
+                            text: 'Sync up'
                         },
                         {
                             xtype: 'tbfill'
@@ -242,12 +295,16 @@ Ext.define('Rubedo.view.MongodbMappingsInterface', {
         if (Ext.isEmpty(selected)){
             Ext.getCmp("mongoMappingsRemoveBtn").disable();
             Ext.getCmp("mongoMappingsSaveBtn").disable();
+            Ext.getCmp("mongoMappingsSyncUpBtn").disable();
+            Ext.getCmp("mongoMappingsSyncDownBtn").disable();
             Ext.getCmp("mongoMappingsHolderPanel").disable();
 
         } else {
             Ext.getCmp("mongoMappingsRemoveBtn").enable();
             Ext.getCmp("mongoMappingsSaveBtn").enable();
             Ext.getCmp("mongoMappingsHolderPanel").enable();
+            Ext.getCmp("mongoMappingsSyncUpBtn").enable();
+            Ext.getCmp("mongoMappingsSyncDownBtn").enable();
             Ext.getCmp("mongoMappingSettingsForm").getForm().setValues(selected[0].getData());
             var fieldsToAdd=[
                 {

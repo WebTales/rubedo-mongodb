@@ -26,6 +26,8 @@ use Zend\EventManager\EventInterface;
 class MongoDBMappings extends AbstractCollection
 {
 
+    protected $otherLocalizableFields = array('text', 'summary');
+
     public function __construct()
     {
         $this->_collectionName = 'MongoDBMappings';
@@ -83,5 +85,62 @@ class MongoDBMappings extends AbstractCollection
             $collection->update(array("rubedoContentId"=>(string)$content["id"]),array('$set'=>$payload),array("upsert"=>true,"w"=>0));
         }
     }
+
+    public function syncContentTypeDown($mappingId,$lang){
+        $mapping = $this->findById($mappingId);
+        $type=Manager::getService("ContentTypes")->findById($mapping["contentTypeId"]);
+        $connection = new \MongoClient($mapping["connexionString"]);
+        $db = $connection->selectDB($mapping["databaseName"]);
+        $collection = $db->selectCollection($mapping["collectionName"]);
+        $unsyncedExternalContents=$collection->find(array("rubedoContentId"=>array('$exists'=>false)));
+        $contentsCollection=Manager::getService("Contents");
+        foreach ($unsyncedExternalContents as $unsyncedDoc){
+            $newContent=array(
+                "typeId"=>$mapping["contentTypeId"],
+                "fields"=>array(),
+                "taxonomy"=>array(),
+                "status"=>"published",
+                "target"=>array("global"),
+                "online"=>true,
+                "startPublicationDate"=>"",
+                "endPublicationDate"=>"",
+                "nativeLanguage"=>$lang,
+                "i18n"=>array(
+                    $lang=>array()
+                )
+            );
+            foreach($mapping["fieldMappings"] as $rubedoField => $externalField){
+                if($externalField&&$externalField!=""&&isset($unsyncedDoc[$externalField])){
+                    $newContent["fields"][$rubedoField]=$unsyncedDoc[$externalField];
+                }
+            }
+            if (isset($newContent["fields"]["text"])){
+                $newContent["text"]=$newContent["fields"]["text"];
+            }
+            $newContent['i18n'][$lang]['fields'] = $this->localizableFields($type, $newContent['fields']);
+            $createdContent=$contentsCollection->create($newContent, array(), false);
+            if ($createdContent["success"]){
+                $collection->update(array("_id"=>$unsyncedDoc["_id"]),array('$set'=>array("rubedoContentId"=>(string)$createdContent["data"]["id"]),),array("w"=>0));
+            }
+        }
+    }
+
+    protected function localizableFields($type, $fields)
+    {
+        $existingFields = array();
+        foreach ($type['fields'] as $field) {
+            if ($field['config']['localizable']) {
+                $existingFields[] = $field['config']['name'];
+            }
+        }
+        foreach ($fields as $key => $value) {
+            unset($value); //unused
+            if (!(in_array($key, $existingFields) || in_array($key, $this->otherLocalizableFields))) {
+                unset ($fields[$key]);
+            }
+        }
+        return $fields;
+    }
+
 
 }
