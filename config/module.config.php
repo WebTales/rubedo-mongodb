@@ -67,4 +67,11 @@ return array(
         ),
     ),
 
+    /*
+    * API endpoint definitions
+    */
+    'namespaces_api' => array(
+        'RubedoMongoDB',
+    ),
+
 );
