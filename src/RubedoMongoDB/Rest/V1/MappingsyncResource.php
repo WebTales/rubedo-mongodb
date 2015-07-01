@@ -55,11 +55,6 @@ class MappingsyncResource extends AbstractResource
                             ->setKey('itemId')
                             ->setFilter('\MongoId')
                             ->setRequired()
-                    )->addInputFilter(
-                        (new FilterDefinitionEntity())
-                            ->setDescription('Language')
-                            ->setKey('lang')
-                            ->setRequired()
                     );
             });
     }
