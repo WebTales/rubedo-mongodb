@@ -18,7 +18,6 @@ namespace RubedoMongoDB\Collection;
 use Rubedo\Collection\AbstractCollection;
 use Rubedo\Services\Manager;
 use WebTales\MongoFilters\Filter;
-use Zend\Debug\Debug;
 use Zend\EventManager\EventInterface;
 
 
@@ -56,16 +55,16 @@ class MongoDBMappings extends AbstractCollection
         $mappingFilter->addFilter(Filter::factory("Value")->setName("active")->setValue(true));
         $mapping = $this->findOne($mappingFilter);
         if ($mapping) {
-            $payload=array();
-            foreach($mapping["fieldMappings"] as $rubedoField => $externalField){
-                if($externalField&&$externalField!=""&&isset($content["fields"][$rubedoField])){
-                    $payload[$externalField]=$content["fields"][$rubedoField];
+            $payload = array();
+            foreach ($mapping["fieldMappings"] as $rubedoField => $externalField) {
+                if ($externalField && $externalField != "" && isset($content["fields"][$rubedoField])) {
+                    $payload[$externalField] = $content["fields"][$rubedoField];
                 }
             }
             $connection = new \MongoClient($mapping["connexionString"]);
             $db = $connection->selectDB($mapping["databaseName"]);
             $collection = $db->selectCollection($mapping["collectionName"]);
-            $collection->update(array("rubedoContentId"=>(string)$content["id"]),array('$set'=>$payload),array("upsert"=>true,"w"=>0));
+            $collection->update(array("rubedoContentId" => (string)$content["id"]), array('$set' => $payload), array("upsert" => true, "w" => 0));
         }
     }
 
@@ -117,11 +116,12 @@ class MongoDBMappings extends AbstractCollection
             if (isset($newContent["fields"]["text"])){
                 $newContent["text"]=$newContent["fields"]["text"];
             }
+            $newId= new \MongoId();
+            $collection->update(array("_id"=>$unsyncedDoc["_id"]),array('$set'=>array("rubedoContentId"=>(string)$newId)),array("w"=>0));
             $newContent['i18n'][$lang]['fields'] = $this->localizableFields($type, $newContent['fields']);
+            $newContent['_id']=$newId;
             $createdContent=$contentsCollection->create($newContent, array(), false);
-            if ($createdContent["success"]){
-                $collection->update(array("_id"=>$unsyncedDoc["_id"]),array('$set'=>array("rubedoContentId"=>(string)$createdContent["data"]["id"]),),array("w"=>0));
-            }
+
         }
     }
 
