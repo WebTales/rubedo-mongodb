@@ -117,7 +117,7 @@ class MongoDBMappings extends AbstractCollection
                 $newContent["text"]=$newContent["fields"]["text"];
             }
             $newId= new \MongoId();
-            $collection->update(array("_id"=>$unsyncedDoc["_id"]),array('$set'=>array("rubedoContentId"=>(string)$newId)),array("w"=>0));
+            $collection->update(array("_id"=>$unsyncedDoc["_id"]),array('$set'=>array("rubedoContentId"=>(string)$newId)));
             $newContent['i18n'][$lang]['fields'] = $this->localizableFields($type, $newContent['fields']);
             $newContent['_id']=$newId;
             $createdContent=$contentsCollection->create($newContent, array(), false);

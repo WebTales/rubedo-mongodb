@@ -105,11 +105,11 @@ class MappingsyncResource extends AbstractResource
             if (isset($newContent["fields"]["text"])){
                 $newContent["text"]=$newContent["fields"]["text"];
             }
+            $newId= new \MongoId();
+            $collection->update(array("_id"=>$unsyncedDoc["_id"]),array('$set'=>array("rubedoContentId"=>(string)$newId)));
             $newContent['i18n'][$lang]['fields'] = $this->localizableFields($type, $newContent['fields']);
+            $newContent['_id']=$newId;
             $createdContent=$this->getContentsCollection()->create($newContent, array(), false);
-            if ($createdContent["success"]){
-                $collection->update(array("_id"=>$unsyncedDoc["_id"]),array('$set'=>array("rubedoContentId"=>(string)$createdContent["data"]["id"]),),array("w"=>0));
-            }
         } else {
             foreach($mapping["fieldMappings"] as $rubedoField => $externalField){
                 if($externalField&&$externalField!=""&&isset($unsyncedDoc[$externalField])){
