@@ -86,6 +86,7 @@ class MongoDBMappings extends AbstractCollection
     }
 
     public function syncContentTypeDown($mappingId,$lang){
+
         $mapping = $this->findById($mappingId);
         $type=Manager::getService("ContentTypes")->findById($mapping["contentTypeId"]);
         $connection = new \MongoClient($mapping["connexionString"]);
@@ -109,18 +110,34 @@ class MongoDBMappings extends AbstractCollection
                 )
             );
             foreach($mapping["fieldMappings"] as $rubedoField => $externalField){
-                if($externalField&&$externalField!=""&&isset($unsyncedDoc[$externalField])){
-                    $newContent["fields"][$rubedoField]=$unsyncedDoc[$externalField];
-                }
+            	
+            	if($externalField&&$externalField!="") {
+            	
+            		$fieldPath=explode(".",$externalField);
+            		$externalFieldValue = isset($unsyncedDoc[$fieldPath[0]]) ? $unsyncedDoc[$fieldPath[0]] : FALSE;
+	            	
+	            	if ($externalFieldValue) {
+	            		if (count($fieldPath)>1) {
+	            			for ($i=1; $i<count($fieldPath); $i++) {
+	            				$externalFieldValue = isset($externalFieldValue[$fieldPath[$i]]) ? $externalFieldValue[$fieldPath[$i]] : FALSE;
+	            				if (!$externalFieldValue) break;
+	            			}
+	            		}           		
+	            	}
+	            	if ($externalFieldValue) {
+	                    $newContent["fields"][$rubedoField]=$externalFieldValue;
+	            	}
+            	}
             }
             if (isset($newContent["fields"]["text"])){
                 $newContent["text"]=$newContent["fields"]["text"];
             }
-            $newId= new \MongoId();
-            $collection->update(array("_id"=>$unsyncedDoc["_id"]),array('$set'=>array("rubedoContentId"=>(string)$newId)));
-            $newContent['i18n'][$lang]['fields'] = $this->localizableFields($type, $newContent['fields']);
-            $newContent['_id']=$newId;
-            $createdContent=$contentsCollection->create($newContent, array(), false);
+		    $newId = new \MongoId();
+		    $collection->update(array("_id"=>$unsyncedDoc["_id"]),array('$set'=>array("rubedoContentId"=>(string)$newId)));
+		    $newContent['i18n'][$lang]['fields'] = $this->localizableFields($type, $newContent['fields']);
+		    $newContent['_id']=$newId;
+var_dump($unsyncedDoc);
+		    $createdContent=$contentsCollection->create($newContent, array(), false);
 
         }
     }
